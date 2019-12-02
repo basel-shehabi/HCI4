@@ -1,0 +1,90 @@
+<!DOCTYPE HTML5>
+<html lang=en>
+
+    <head>
+        <meta charset='utf-8'>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>>
+        <style>
+            p {
+                font-size: 24px
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- Uses CSS Bootstrap to split the page into 3 columns using the row and col class -->
+        <div class="container-fluid">
+            <div class="row">
+
+                <div class="col"></div>
+                <div class="col text-center">
+                    <img src="SiteLogo.png"></img>
+                    <br>
+                    <div id='test'>
+                        <br>
+                        <h3>Please <a href="javascript:elementVisibility()">Click Here</a> To Begin!</h3>
+                    </div>
+                    <br>
+
+                    <!-- Adds audio that plays after pressing click here -->
+                    <div id='second' class="card card-body container">
+                        <audio src="Welcome.mp3" id='welcome_audio' loop="false"></audio>
+                        <h2>Live better is a website with the aims to educate the public about population health as well as
+                            spreading awareness about risk factors.</h2>
+                        <p>To proceed, please choose from one of the following options</p>
+                    </div>
+                    <br><br>
+
+                    <!-- The form which is meant to redirect you to each risk factor contained on separate pages. Currently it only redirects to the alcohol one in form action -->
+                    <div id='third'>
+                        <form action="alcohol.html">
+                            <div class="form-group">
+                                <select class="form-control" id="sel1" name="sellist1">
+                                    <option>Alcohol</option>
+                                    <option>Smoking</option>
+                                    <option>Blood Pressure</option>
+                                </select>  
+                            </div>
+                            <button type="submit" class="btn btn-primary">Proceed</button>
+                        </form>
+                    </div>
+
+                </div>
+                <!-- Volume Control -->
+                <div class="col" style="text-align:right;">
+                    <input id="vol-control" type="range" min="0" max="100" step="1" oninput="setVolume(this.value)"
+                    onchange="setVolume(this.value)"></input>
+                </div>
+
+            </div>
+
+        <script>
+            
+            //added plain JavaScript to deal with elements loading and playing audio & slider
+            document.getElementById('second').style.visibility = 'hidden';
+            document.getElementById('third').style.visibility = 'hidden';
+
+            function elementVisibility() {
+                var element = document.getElementById('test');
+                element.remove();
+                document.getElementById('second').style.visibility = 'visible';
+                document.getElementById('third').style.visibility = 'visible';
+                document.getElementById('welcome_audio').play();
+                document.getElementById('welcome_audio').loop = false;
+            }
+
+            function setVolume(val) {
+                let player = document.getElementById('welcome_audio');
+                player.volume = val / 100;
+                console.log("player.volume")
+            }
+
+        </script>
+
+    </body>
+    
+</html>
