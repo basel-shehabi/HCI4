@@ -8,6 +8,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>>
+        <script src="https://d3js.org/d3.v4.js"></script>
         <style>
             p {
                 font-size: 24px
@@ -19,9 +20,8 @@
         <!-- Uses CSS Bootstrap to split the page into 3 columns using the row and col class -->
         <div class="container-fluid">
             <div class="row">
-
                 <div class="col"></div>
-                <div class="col text-center">
+                <div class="col-sm-5 text-center">
                     <img src="SiteLogo.png"></img>
                     <br>
                     <div id='test'>
@@ -35,23 +35,10 @@
                         <audio src="Welcome.mp3" id='welcome_audio' loop="false"></audio>
                         <h2>Live better is a website with the aims to educate the public about population health as well as
                             spreading awareness about risk factors.</h2>
-                        <p>To proceed, please choose from one of the following options</p>
+                        <p>To proceed, click on a bar in the chart below, you may enter your details to see your risk if you like!</p>
                     </div>
                     <br><br>
 
-                    <!-- The form which is meant to redirect you to each risk factor contained on separate pages. Currently it only redirects to the alcohol one in form action -->
-                    <div id='third'>
-                        <form action="alcohol.html">
-                            <div class="form-group">
-                                <select class="form-control" id="sel1" name="sellist1">
-                                    <option>Alcohol</option>
-                                    <option>Smoking</option>
-                                    <option>Blood Pressure</option>
-                                </select>  
-                            </div>
-                            <button type="submit" class="btn btn-primary">Proceed</button>
-                        </form>
-                    </div>
 
                 </div>
                 <!-- Volume Control -->
@@ -61,18 +48,70 @@
                 </div>
 
             </div>
+            <div class = "row">
+                <!-- graph column -->
+                <div class = "col text-right">
+                    
+                    <!-- The form which is meant to redirect you to each risk factor contained on separate pages. Currently it only redirects to the alcohol one in form action -->
+                    <div id='third'>
+
+                        <!-- Create a div where the graph will take place -->
+                        
+    
+                        <!-- Create a div where the graph will take place -->
+                        <div id="my_dataviz"></div>                     
+                    </div> 
+                </div>
+                <!-- sliders column -->
+                <div id = 'fourth' class="col my-auto float-left"> 
+                    
+                    <!-- Add buttons -->
+                    <div class="row">
+                            <h3 class="mr-3">Show:</h3>
+                            <button onclick="update('Both sexes', false)">All Data</button>
+                            <button onclick="update('Male', false)">Male</button>
+                            <button onclick="update('Female', false)">Female</button> 
+                        </div>
+                    
+                    <h3 class="row mt-4">My Lifestyle...</h3> 
+                           
+                    <!-- slider alcohol -->
+                    <div class="row mt-4"><h5>How many units of alcohol I drink per week</h5></div>
+                    <div class="row mt-3">
+                        <input id ="range0" type="range" min="0" max="100" value="0" class="custom-range" style="width: 400px; margin-right: 10px;"/>         
+                    </div>
+                    <div class="row justify-content-center" id="rangeValue0" style="width: 400px; margin-right: 10px;"></div>
+
+                    <!-- slider smoking -->
+                    <div class="row mt-4"><h5>How many cigarettes I smoke per week</h5></div>
+                    <div class="row mt-3">
+                        <input id ="range1" type="range" min="0" max="100" value="0" class="custom-range" style="width: 400px; margin-right: 10px;"/>
+                    </div>
+                    <div class="row justify-content-center" id="rangeValue1" style="width: 400px; margin-right: 10px;"></div>
+      
+                    <!-- slider bmi -->
+                    <div class="row mt-4"><h5>My Body Mass Index (bmi)</h5></div>
+                    <div class="row mt-3">
+                        <input id ="range2" type="range" min="0" max="50" value="0" class="custom-range" style="width: 400px; margin-right: 10px;"/>
+                    </div> 
+                    <div class="row justify-content-center" id="rangeValue2" style="width: 400px; margin-right: 10px;"></div>
+
+                </div>
+            </div>
 
         <script>
             
             //added plain JavaScript to deal with elements loading and playing audio & slider
             document.getElementById('second').style.visibility = 'hidden';
             document.getElementById('third').style.visibility = 'hidden';
+            document.getElementById('fourth').style.visibility = 'hidden';
 
             function elementVisibility() {
                 var element = document.getElementById('test');
                 element.remove();
                 document.getElementById('second').style.visibility = 'visible';
                 document.getElementById('third').style.visibility = 'visible';
+                document.getElementById('fourth').style.visibility = 'visible';
                 document.getElementById('welcome_audio').play();
                 document.getElementById('welcome_audio').loop = false;
             }
@@ -82,6 +121,157 @@
                 player.volume = val / 100;
                 console.log("player.volume")
             }
+
+            // graph stuff
+
+            // set the dimensions and margins of the graph
+            var margin = {top: 30, right: 30, bottom: 70, left: 60},
+                width = 560 - margin.left - margin.right,
+                height = 500 - margin.top - margin.bottom;
+
+
+            // append the svg object to the body of the page
+            var svg = d3.select("#my_dataviz")
+                .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                    .attr("transform",
+                        "translate(" + margin.left + "," + margin.top + ")");
+
+            // add a title to the graph
+            svg.append("text")
+                .attr("x", (width / 2))             
+                .attr("y", 0 - (margin.top / 2))
+                .attr("text-anchor", "middle")  
+                .style("font-size", "16px") 
+                .style("text-decoration", "underline")  
+                .text("NHS hospital admissions where Cause was a factor");
+
+            // Initialize the X axis
+            var x = d3.scaleBand()
+            .range([ 0, width ])
+            .padding(0.2);
+            var xAxis = svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+
+            // text label for the x axis
+            svg.append("text")             
+                .attr("transform",
+                        "translate(" + (width/2) + " ," + 
+                                    (height + margin.top + 20) + ")")
+                .style("text-anchor", "middle")
+                .text("Cause");
+
+            // Initialize the Y axis
+            var y = d3.scaleLinear()
+            .range([ height, 0]);
+            var yAxis = svg.append("g")
+            .attr("class", "myYaxis")
+
+            // text label for the y axis
+            svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0 - margin.left)
+                .attr("x",0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("Hospital Admissions (thousand)");
+
+            // A function that create / update the plot for a given variable:
+            function update(selectedVar, test) {
+
+                // Parse the Data
+                d3.csv("data.csv", function(data) {
+
+                // X axis
+                x.domain(data.map(function(d) { return d.Causes; }))
+                xAxis.transition().duration(1000).call(d3.axisBottom(x))
+
+                // Add Y axis
+                y.domain([0, d3.max(data, function(d) { return +d['Both sexes'] }) ]);
+                yAxis.transition().duration(1000).call(d3.axisLeft(y));
+
+                // variable u: map data to existing bars
+                var u = svg.selectAll("rect")
+                    .data(data)
+
+
+                // update bars
+                u
+                    .enter()
+                    .append("rect")
+                    //.on("mouseover", function(d){console.log("hover");})
+                    .on("click", function(d){window.location.href = d.Causes+".html";})
+                    .merge(u)
+                    .transition()
+                    .duration(1000)
+                    .attr("x", function(d) { return x(d.Causes); })
+                    .attr("y", function(d) { return y(d[selectedVar]); })
+                    .attr("width", x.bandwidth())
+                    .attr("height", function(d) { return height - y(d[selectedVar]); })
+                    .attr("fill", "red")
+                    .style("fill-opacity", function(d) {if (test==true) return 0; else return this})
+                    .attr("stroke", "black")
+                    .attr("id", function(d,i) {return 'bar_' + i})
+                })
+            }
+
+
+        
+
+
+            // Initialize plot
+            update('Both sexes', true);   
+
+
+            d3.select("#range0").on("input", function () { 
+                svg.select('#bar_0')
+                    .transition()
+                    .duration(1000)
+                    .ease(d3.easeLinear)
+                    .style("fill-opacity", d3.select("#range0").property("value")/100 - 0.14);
+            });
+
+            var slider0 = document.getElementById("range0");
+            var output0 = document.getElementById("rangeValue0");
+            output0.innerHTML = slider0.value; // Display the default slider value
+
+            // Update the current slider value (each time you drag the slider handle)
+            slider0.oninput = function() {
+            output0.innerHTML = this.value;}
+
+            // smoking
+            d3.select("#range1").on("input", function () { 
+                svg.select('#bar_1')
+                    .transition()
+                    .duration(1000)
+                    .ease(d3.easeLinear)
+                    .style("fill-opacity", d3.select("#range1").property("value")/100 * 3);
+            });
+            var slider1 = document.getElementById("range1");
+            var output1 = document.getElementById("rangeValue1");
+            output1.innerHTML = slider1.value; // Display the default slider value
+
+            // Update the current slider value (each time you drag the slider handle)
+            slider1.oninput = function() {
+            output1.innerHTML = this.value;}
+
+            d3.select("#range2").on("input", function () { 
+                svg.select('#bar_2')
+                    .transition()
+                    .duration(1000)
+                    .ease(d3.easeLinear)
+                    .style("fill-opacity", d3.select("#range2").property("value")/25 - 1);
+            });
+
+            var slider2 = document.getElementById("range2");
+            var output2 = document.getElementById("rangeValue2");
+            output2.innerHTML = slider2.value; // Display the default slider value
+
+            // Update the current slider value (each time you drag the slider handle)
+            slider2.oninput = function() {
+            output2.innerHTML = this.value;}
 
         </script>
 

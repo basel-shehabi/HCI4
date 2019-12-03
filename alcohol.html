@@ -37,20 +37,11 @@
         <ul class="carousel-indicators" style="background-color:grey">
             <li data-target="#demo" data-slide-to="0" class="active"></li>
             <li data-target="#demo" data-slide-to="1"></li>
-            <li data-target="#demo" data-slide-to="2"></li>
         </ul>
 
         <!-- The slideshow -->
         <div class="carousel-inner">
             <div class="carousel-item active" style="text-align:center;">
-                <p class="text-center">Please choose from one of the following options:</p>
-                <p>How many drinks (unit of alcohol) do you have per week?</p>
-                <!-- introduces radio buttons. User input should cause change into next slide (Not Yet Implemented)-->
-                <label class="radio-inline"><input type="radio" name="optradio"> &lt;10 </label>
-                <label class="radio-inline"><input type="radio" name="optradio"> 10-20 </label>
-                <label class="radio-inline"><input type="radio" name="optradio"> &gt;20</label>
-            </div>
-            <div class="carousel-item" style="text-align:center;">
                 <p>Based on your choices, here are some statistics on drinking.</p>
                 <svg width="600" height="500"></svg>
 
@@ -129,9 +120,7 @@
             $(".item2").click(function () {
                 $("#demo").carousel(1);
             });
-            $(".item3").click(function () {
-                $("#demo").carousel(2);
-            });
+
 
             // Enable Carousel Controls
             $(".carousel-control-prev").click(function () {
