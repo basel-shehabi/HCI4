@@ -182,7 +182,7 @@
             function update(selectedVar, test) {
 
                 // Parse the Data
-                d3.csv("data.csv", function(data) {
+                d3.csv("https://gist.githubusercontent.com/RobbieAndrews/8ffaf2b1423cc5792498dbf79d338345/raw/f2a7453b02f104cbe4b6bcedb824c9e1c69fd360/hospital_admissions.csv", function(data) {
 
                 // X axis
                 x.domain(data.map(function(d) { return d.Causes; }))
@@ -201,7 +201,20 @@
                 u
                     .enter()
                     .append("rect")
-                    //.on("mouseover", function(d){console.log("hover");})
+                    .on("mouseenter", function(s, i){
+                        d3.select(this)
+                        .transition()
+                        .duration(300)
+                        .attr('stroke', 'blue')
+                        .attr('x', (a) => x(a.Causes) - 5)
+                        .attr('width', x.bandwidth() + 10)})
+                    .on("mouseout", function(s, i){
+                        d3.select(this)
+                        .transition()
+                        .duration(300)
+                        .attr('stroke', 'black')
+                        .attr('x', (a) => x(a.Causes))
+                        .attr('width', x.bandwidth())})
                     .on("click", function(d){window.location.href = d.Causes+".html";})
                     .merge(u)
                     .transition()
