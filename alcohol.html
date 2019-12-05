@@ -12,7 +12,7 @@
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <style>
         p {
-            font-size: 24px
+            font-size: 20px
         }
         .bar {
             fill: steelblue;
@@ -46,50 +46,109 @@
         <!-- The slideshow -->
         <div class="carousel-inner">
             <div class="carousel-item active" style="text-align:center;">
-                <p>Based on your choices, here are some statistics on drinking.</p>
-                <svg width="600" height="500"></svg>
+                <p style="font-size:18px;">Based on your choices, here are some statistics on drinking.</p>
+                <div id="my_dataviz"></div>
+                
+                <div class="col" style="text-align: left;">
+                    <ul>
+                    <li><b>NCD:</b> is a non-communicable disease (one that can't be passed on)</li>
+                    <li><b>Alcohol-attributable fraction: </b>the proportion of a health outcome which is caused by alcohol (i.e. that proportion which would disappear if alcohol consumption was removed). Alcohol consumption has a causal impact on more than 200 health conditions (diseases and injuries)</li>
+                    <li><b>Liver cirrhosis: </b>scarring of the liver caused by long-term liver damage. The scar tissue prevents the liver working properly.</li>
+                    <li><b>Traffic crashes: </b>road traffic accidents</li>
+                    <li><b>Cancer: </b>a disease caused when cells divide uncontrollably and spread into surrounding tissues.</li>
+                    </ul>
+                </div>
+                
 
                 <script>
-                    //creates an svg element based on the parameters specified earlier
-                    var svg = d3.select("svg"), 
-                        margin = 200, //the margin then adjusts the width and height. The attribute method sets/returns attributes of certain elements
-                        width = svg.attr("width") - margin, 
-                        height = svg.attr("height") - margin
-            
-            
-                    var xScale = d3.scaleBand().range([0, width]).padding(0.7); //scaleBand() is a d3 function that allows for creating a band scale for discrete bands. The range is svg width
-                    var yScale = d3.scaleLinear().range([height, 0]); //scaleLinear() creates a linear scale
-            
-                    var g = svg.append("g") //adds a group element to the svg where it will be used to add axes and bars to the group element
-                            .attr("transform", "translate(" + 100 + "," + 100 + ")"); 
+                    // set the dimensions and margins of the graph
+                    var margin = {top: 30, right: 30, bottom: 70, left: 60},
+                        width = 560 - margin.left - margin.right,
+                        height = 500 - margin.top - margin.bottom;
+
+
+                    // append the svg object to the body of the page
+                    var svg = d3.select("#my_dataviz")
+                        .append("svg")
+                            .attr("width", width + margin.left + margin.right)
+                            .attr("height", height + margin.top + margin.bottom)
+                        .append("g")
+                            .attr("transform",
+                                "translate(" + margin.left + "," + margin.top + ")");
+
+                    // add a title to the graph
+                    svg.append("text")
+                        .attr("x", (width / 2))             
+                        .attr("y", 0 - (margin.top / 2))
+                        .attr("text-anchor", "middle")  
+                        .style("font-size", "16px") 
+                        .style("text-decoration", "underline")  
+                        .text("Alcohol-attributable fraction for NCDs");
+
+                    // Initialize the X axis
+                    var x = d3.scaleBand()
+                    .range([ 0, width ])
+                    .padding(0.2);
+                    var xAxis = svg.append("g")
+                    .attr("transform", "translate(0," + height + ")")
+
+                    // text label for the x axis
+                    svg.append("text")             
+                        .attr("transform",
+                                "translate(" + (width/2) + " ," + 
+                                            (height + margin.top + 20) + ")")
+                        .style("text-anchor", "middle")
+                        .text("Disease");
+
+                    // Initialize the Y axis
+                    var y = d3.scaleLinear()
+                    .range([ height, 0]);
+                    var yAxis = svg.append("g")
+                    .attr("class", "myYaxis")
+
+                    // text label for the y axis
+                    svg.append("text")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", 0 - margin.left)
+                        .attr("x",0 - (height / 2))
+                        .attr("dy", "1em")
+                        .style("text-anchor", "middle")
+                        .text("Alcohol-attributable fraction (%)");
+
+                    // A function that create / update the plot for a given variable:
+                    function update() {
+
+                        // Parse the Data
+                        d3.csv("https://gist.githubusercontent.com/RobbieAndrews/3d9ed7bd8a0f154551ce6e2212e9af83/raw/5002634dc09a389ed2a37fb224578e1f5884b566/gistfile1.txt", function(data) {
+
+                        // X axis
+                        x.domain(data.map(function(d) { return d.Disease; }))
+                        xAxis.transition().duration(1000).call(d3.axisBottom(x))
+
+                        // Add Y axis
+                        y.domain([0, d3.max(data, function(d) { return +d.Deaths }) ]);
+                        yAxis.transition().duration(1000).call(d3.axisLeft(y));
+
+                        // variable u: map data to existing bars
+                        var u = svg.selectAll("rect")
+                            .data(data)
+
+
+                        // update bars
+                        u
+                            .enter()
+                            .append("rect")
+                            .attr("x", function(d) { return x(d.Disease); })
+                            .attr("y", function(d) { return y(d.Deaths); })
+                            .attr("width", x.bandwidth())
+                            .attr("height", function(d) { return height - y(d.Deaths); })
+                            .attr("fill", '#69b3a2')
+                        })
+                    }
+                    // Initialize plot
+                    update();
+
                     
-                    //load the csv file using d3.csv method thats stored on gist github using CORS 
-                    //the data is a much simpler and cutdown version of the bigger data that I have just used to check I can use d3.js properly
-                    d3.csv("https://gist.githubusercontent.com/basel-shehabi/3ff3fbbc1834bb8a5d8d4e9656ad30a4/raw/811bcd0b44268194de061c94d4862ab7b00eca6a/sampledata.csv", function (data) {
-                        //adds domain values from the read data to the scales as shown below:
-                            xScale.domain(data.map(function (d) { return d.Unit; })); 
-                            yScale.domain([0, d3.max(data, function (d) { return d.Year; })]);
-                            
-                            //creates x and y axis
-                            g.append("g")
-                             .attr("transform", "translate(0," + height + ")")
-                             .call(d3.axisBottom(xScale));
-            
-                            g.append("g")
-                             .call(d3.axisLeft(yScale).tickFormat(function (d) {
-                                return d;
-                             }).ticks(10));
-            
-                            //creates the bars
-                            g.selectAll(".bar")
-                             .data(data)
-                             .enter().append("rect")
-                             .attr("class", "bar")
-                             .attr("x", function (d) { return xScale(d.Unit); })
-                             .attr("y", function (d) { return yScale(d.Year); })
-                             .attr("width", xScale.bandwidth())
-                             .attr("height", function (d) { return height - yScale(d.Year); });
-                    });
                 </script>
 
                 <!-- Similar to radio buttons, click should take the user to tips slide (also Not Yet Implemented)-->
@@ -99,6 +158,8 @@
             <div class="carousel-item" style="text-align:center;">
                 <h1>Here are some tips to lead a healthier lifestyle:</h1>
                 <br><br>
+                <h3>Recommended intake</h3>
+                <p>The recommended maximum intake of alcohol is 14 units</p>
                 <h3>Keeping Track of Drinking Habits</h3>
                 <p>It is recommended to keep track of your alcohol intake to ensure you're not overdrinking</p>
                 <h3>Buying Low-alcohol Alternatives</h3>
