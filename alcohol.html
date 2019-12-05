@@ -23,6 +23,10 @@
 <body>
 
     <div class="container">
+        <div class="col" style="text-align:right;">
+            <input id="vol-control" type="range" min="0" max="100" step="1" oninput="setVolume(this.value)"
+            onchange="setVolume(this.value)"></input>
+        </div>
         <br><br>
         <div class="card card-body" style="background: gray;">
             <h1 class="text-center">Alcoholism</h1>
@@ -93,7 +97,16 @@
                 
             </div>
             <div class="carousel-item" style="text-align:center;">
-                <p>Here are some tips to lead a healthier lifestyle</p>
+                <h1>Here are some tips to lead a healthier lifestyle:</h1>
+                <br><br>
+                <h3>Keeping Track of Drinking Habits</h3>
+                <p>It is recommended to keep track of your alcohol intake to ensure you're not overdrinking</p>
+                <h3>Buying Low-alcohol Alternatives</h3>
+                <p>Purchasing light beer and other lower alcohol substitutes could help cutting down</p>
+                <h3>Staying Hydrated</h3>
+                <p>Having a glass of water between drinks could help curb your desire to drink</p>
+                <h3>Set a goal and make a plan</h3>
+                <p>Start by seting small goals then gradually increase when you have slowly controlled your drinking habits</p>
             </div>
         </div>
         <br><br>
@@ -107,6 +120,14 @@
         </a>
 
     </div>
+    
+    <script>
+    function setVolume(val) {
+        let player = document.getElementById('welcome_audio');
+        player.volume = val / 100;
+        console.log("player.volume")
+    }
+    </script>
 
     <script>
         $(document).ready(function(){
